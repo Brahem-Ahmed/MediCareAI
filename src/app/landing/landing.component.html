@@ -12,8 +12,13 @@
         <a href="#security" class="nav-link">Security</a>
       </nav>
       <div class="header-buttons">
-        <button class="sign-up-btn" (click)="navigateToSignup()">SIGN UP</button>
-        <button class="sign-in-btn" (click)="navigateToRoleSelection()">SIGN IN</button>
+        @if (currentUser$ | async; as user) {
+          <button class="profile-btn" (click)="navigateToProfile(user.role)">PROFILE</button>
+          <button class="logout-btn" (click)="logout()">LOG OUT</button>
+        } @else {
+          <button class="sign-up-btn" (click)="navigateToSignup()">SIGN UP</button>
+          <button class="sign-in-btn" (click)="navigateToRoleSelection()">SIGN IN</button>
+        }
       </div>
     </div>
   </header>
@@ -143,4 +148,12 @@
       </div>
     </div>
   </footer>
+
+  @if (showLoginModal) {
+    <div class="login-modal-backdrop" (click)="closeLoginModal()">
+      <div class="login-modal-panel" (click)="$event.stopPropagation()">
+        <app-login [modalMode]="true" (close)="closeLoginModal()"></app-login>
+      </div>
+    </div>
+  }
 </div>

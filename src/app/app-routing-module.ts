@@ -1,85 +1,27 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LandingComponent } from './landing/landing.component';
-import { AdminComponent } from './admin/admin.component';
-import { LoginComponent } from './login/login.component';
-import { SignupComponent } from './signup/signup.component';
-import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
-import { AuthGuard } from './services/auth.guard';
-import { DashboardComponent } from './admin/modules/dashboard/dashboard.component';
-import { UserListComponent } from './admin/modules/user-management/user-list.component';
-import { UserCreateComponent } from './admin/modules/user-management/user-create.component';
-import { AppointmentListComponent } from './admin/modules/appointments/appointment-list.component';
-import { AppointmentCreateComponent } from './admin/modules/appointments/appointment-create.component';
-import { MedicalManagementComponent } from './admin/modules/medical/medical-management.component';
-import { EventsListComponent } from './admin/modules/events/events-list.component';
-import { SubscriptionManagementComponent } from './admin/modules/subscriptions/subscription-management.component';
-import { ForumManagementComponent } from './admin/modules/forum/forum-management.component';
+import { ADMIN_ROUTES } from './modules/admin/admin.routes';
+import { APPOINTMENTS_SCHEDULING_ROUTES } from './modules/appointments-scheduling/appointments-scheduling.routes';
+import { COLLABORATION_ROUTES } from './modules/collaboration/collaboration.routes';
+import { COMMUNITY_EVENTS_ROUTES } from './modules/community-events/community-events.routes';
+import { E_PHARMACY_ROUTES } from './modules/e-pharmacy/e-pharmacy.routes';
+import { HEALTH_TRACKER_ROUTES } from './modules/health-tracker/health-tracker.routes';
+import { MEDICAL_RECORD_ROUTES } from './modules/medical-record/medical-record.routes';
+import { SYMPTOM_AI_ROUTES } from './modules/symptom-ai/symptom-ai.routes';
+import { USER_AUTH_ROUTES } from './modules/user-auth/user-auth.routes';
 
 const routes: Routes = [
   { path: '', component: LandingComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-  {
-    path: 'pharmacy',
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./pages/pharmacy/pharmacy-home.component').then(m => m.PharmacyHomeComponent)
-      },
-      {
-        path: 'medicines',
-        loadComponent: () => import('./pages/pharmacy/medicine-catalog.component').then(m => m.MedicineCatalogComponent)
-      },
-      {
-        path: 'medicines/:id',
-        loadComponent: () => import('./pages/pharmacy/medicine-detail.component').then(m => m.MedicineDetailComponent)
-      },
-      {
-        path: 'cart',
-        loadComponent: () => import('./pages/pharmacy/cart.component').then(m => m.CartComponent)
-      },
-      {
-        path: 'checkout',
-        loadComponent: () => import('./pages/pharmacy/checkout.component').then(m => m.CheckoutComponent)
-      },
-      {
-        path: 'order-confirmation',
-        loadComponent: () => import('./pages/pharmacy/order-confirmation.component').then(m => m.OrderConfirmationComponent)
-      },
-      {
-        path: 'prescriptions',
-        loadComponent: () => import('./pages/pharmacy/prescriptions-list.component').then(m => m.PrescriptionsListComponent)
-      },
-      {
-        path: 'inventory',
-        loadComponent: () => import('./pages/pharmacy/inventory.component').then(m => m.InventoryComponent)
-      },
-      {
-        path: 'refills',
-        loadComponent: () => import('./pages/pharmacy/refills.component').then(m => m.RefillsComponent)
-      }
-    ]
-  },
-  { 
-    path: 'admin', 
-    component: AdminComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['ADMIN'] },
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'users', component: UserListComponent },
-      { path: 'users/create', component: UserCreateComponent },
-      { path: 'appointments', component: AppointmentListComponent },
-      { path: 'appointments/create', component: AppointmentCreateComponent },
-      { path: 'medical', component: MedicalManagementComponent },
-      { path: 'events', component: EventsListComponent },
-      { path: 'subscriptions', component: SubscriptionManagementComponent },
-      { path: 'forum', component: ForumManagementComponent }
-    ]
-  },
+  ...USER_AUTH_ROUTES,
+  ...MEDICAL_RECORD_ROUTES,
+  ...APPOINTMENTS_SCHEDULING_ROUTES,
+  ...SYMPTOM_AI_ROUTES,
+  ...E_PHARMACY_ROUTES,
+  ...HEALTH_TRACKER_ROUTES,
+  ...COLLABORATION_ROUTES,
+  ...COMMUNITY_EVENTS_ROUTES,
+  ...ADMIN_ROUTES,
 ];
 
 @NgModule({

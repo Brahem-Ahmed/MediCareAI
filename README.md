@@ -10,6 +10,19 @@ This is the Angular frontend for the **MediCare AI** platform – a comprehensiv
 - **Angular Router** with role‑based guards
 - **JWT** authentication 
 
+## Clear module structure
+
+- User & Auth: [src/app/modules/user-auth](src/app/modules/user-auth)
+- Medical Record: [src/app/modules/medical-record](src/app/modules/medical-record)
+- Appointments & Scheduling: [src/app/modules/appointments-scheduling](src/app/modules/appointments-scheduling)
+- Symptom AI: [src/app/modules/symptom-ai](src/app/modules/symptom-ai)
+- E-Pharmacy: [src/app/modules/e-pharmacy](src/app/modules/e-pharmacy)
+- Health Tracker: [src/app/modules/health-tracker](src/app/modules/health-tracker)
+- Collaboration: [src/app/modules/collaboration](src/app/modules/collaboration)
+- Community & Events: [src/app/modules/community-events](src/app/modules/community-events)
+
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+
 ## Modules
 The frontend is organized by feature modules, each corresponding to a backend domain:
 

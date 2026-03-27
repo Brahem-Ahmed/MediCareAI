@@ -7,20 +7,20 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { LandingComponent } from './landing/landing.component';
-import { AdminComponent } from './admin/admin.component';
-import { LoginComponent } from './login/login.component';
-import { SignupComponent } from './signup/signup.component';
-import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { AdminComponent } from './modules/admin/components/admin-shell/admin.component';
+import { LoginComponent } from './modules/user-auth/components/login/login.component';
+import { SignupComponent } from './modules/user-auth/components/signup/signup.component';
+import { ForgotPasswordComponent } from './modules/user-auth/components/forgot-password/forgot-password.component';
 import { AuthInterceptor } from './services/auth.interceptor';
 
 // Admin Module Components
-import { DashboardComponent } from './admin/modules/dashboard/dashboard.component';
-import { UserListComponent } from './admin/modules/user-management/user-list.component';
-import { AppointmentListComponent } from './admin/modules/appointments/appointment-list.component';
-import { MedicalManagementComponent } from './admin/modules/medical/medical-management.component';
-import { EventsListComponent } from './admin/modules/events/events-list.component';
-import { SubscriptionManagementComponent } from './admin/modules/subscriptions/subscription-management.component';
-import { ForumManagementComponent } from './admin/modules/forum/forum-management.component';
+import { DashboardComponent } from './modules/admin/components/dashboard/dashboard.component';
+import { UserListComponent } from './modules/admin/components/user-management/user-list.component';
+import { AppointmentListComponent } from './modules/admin/components/appointments/appointment-list.component';
+import { MedicalManagementComponent } from './modules/admin/components/medical/medical-management.component';
+import { EventsListComponent } from './modules/admin/components/events/events-list.component';
+import { SubscriptionManagementComponent } from './modules/admin/components/subscriptions/subscription-management.component';
+import { ForumManagementComponent } from './modules/admin/components/forum/forum-management.component';
 
 @NgModule({
   declarations: [
