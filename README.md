@@ -3,7 +3,7 @@
 This is the Angular frontend for the **MediCare AI** platform – a comprehensive healthcare ecosystem that connects patients, doctors, and healthcare professionals through AI‑assisted tools, teleconsultation, medical records, and more.
 
 ## Tech Stack
-- **Angular 21** (standalone components)
+- **Angular 21** 
 - **RxJS** for reactive state management
 - **NgRx** (optional, for complex state – used for authentication and core data)
 - **Angular Material** / Tailwind CSS for UI components
