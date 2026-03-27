@@ -1,61 +1,23 @@
-# MediCareAIFront
+# MediCare AI – Frontend
 
-MediCareAIFront is the Angular frontend for the MediCareAI platform, including authentication, admin modules, and a pharmacy workflow (catalog, cart, checkout, inventory, and refills).
+This is the Angular frontend for the **MediCare AI** platform – a comprehensive healthcare ecosystem that connects patients, doctors, and healthcare professionals through AI‑assisted tools, teleconsultation, medical records, and more.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+## Tech Stack
+- **Angular 21** (standalone components)
+- **RxJS** for reactive state management
+- **NgRx** (optional, for complex state – used for authentication and core data)
+- **Angular Material** / Tailwind CSS for UI components
+- **Angular Router** with role‑based guards
+- **JWT** authentication 
 
-## Development server
+## Modules
+The frontend is organized by feature modules, each corresponding to a backend domain:
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **User & Auth** – login, signup, profile management, role‑based routing
+- **Medical Record** – view and manage health records, prescriptions, images
+- **Appointments & Scheduling** – book, reschedule, cancel appointments; video call integration
+- **Symptom AI** – interactive symptom checker, risk assessment, triage advice
+- **E‑Pharmacy** – medicine catalog, cart, orders, prescriptions (upload/create), inventory, refills
+- **Health Tracker** – sync wearables, set goals, view insights and trends
+- **Collaboration** – doctor‑doctor consultations, shared case discussions, virtual meetings
+- **Community & Events** – forums, feedback, subscriptions, health webinars
