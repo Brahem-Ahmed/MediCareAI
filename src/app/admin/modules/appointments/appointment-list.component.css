@@ -1,0 +1,6 @@
+@import '../user-management/user-list.component.css';
+
+.status-SCHEDULED { background: #dbeafe; color: #1e40af; }
+.status-COMPLETED { background: #dcfce7; color: #166534; }
+.status-CANCELLED { background: #fee2e2; color: #dc2626; }
+.status-NO_SHOW { background: #f3f4f6; color: #6a7282; }

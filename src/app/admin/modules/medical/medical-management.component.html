@@ -1,0 +1,82 @@
+<div class="module-container">
+  <div class="module-header">
+    <h2>Medical Data Management</h2>
+    <p>Manage specialties, diseases, and symptoms</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'specialties'" (click)="activeTab = 'specialties'">
+      Specialties
+    </button>
+    <button class="tab" [class.active]="activeTab === 'diseases'" (click)="activeTab = 'diseases'">
+      Diseases
+    </button>
+    <button class="tab" [class.active]="activeTab === 'symptoms'" (click)="activeTab = 'symptoms'">
+      Symptoms
+    </button>
+  </div>
+
+  <div *ngIf="activeTab === 'specialties'">
+    <div class="controls-bar">
+      <button class="btn btn-primary">Add Specialty</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let specialty of specialties">
+            <td>{{ specialty.id }}</td>
+            <td>{{ specialty.name }}</td>
+            <td>{{ specialty.description }}</td>
+            <td>
+              <button class="btn-icon">Edit</button>
+              <button class="btn-icon btn-danger" (click)="deleteSpecialty(specialty.id!)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="activeTab === 'diseases'">
+    <div class="controls-bar">
+      <button class="btn btn-primary">Add Disease</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Specialty ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let disease of diseases">
+            <td>{{ disease.id }}</td>
+            <td>{{ disease.name }}</td>
+            <td>{{ disease.description }}</td>
+            <td>{{ disease.specialtyId }}</td>
+            <td>
+              <button class="btn-icon">Edit</button>
+              <button class="btn-icon btn-danger" (click)="deleteDisease(disease.id!)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="activeTab === 'symptoms'">
+    <p class="info-text">Symptoms management coming soon...</p>
+  </div>
+</div>
