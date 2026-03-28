@@ -2,6 +2,9 @@
   <div class="module-header">
     <h2>Schedule Appointment</h2>
     <p>Create a new appointment for a patient</p>
+    <button type="button" class="btn btn-secondary" (click)="navigateToAvailability()">
+      Open Availability Picker
+    </button>
   </div>
 
   <div *ngIf="success" class="success-message">

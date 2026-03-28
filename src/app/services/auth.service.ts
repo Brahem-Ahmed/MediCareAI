@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface SignupRequest {
   firstName: string;
@@ -57,7 +58,9 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8089/MediCareAI/auth';
+  private baseUrl = environment.apiUrl.replace(/\/+$/, '');
+  private apiUrl = `${this.baseUrl}/auth`;
+  private patientUrl = `${this.baseUrl}/patient`;
   private currentUserSubject: BehaviorSubject<any>;
   public currentUser: Observable<any>;
   private tokenSubject: BehaviorSubject<string | null>;
@@ -161,6 +164,13 @@ export class AuthService {
         console.log('Password reset successfully:', response);
       })
     );
+  }
+
+  /**
+   * Health check endpoint from patient-controller
+   */
+  getPatientHello(): Observable<string> {
+    return this.http.get(`${this.patientUrl}/hello`, { responseType: 'text' });
   }
 
   /**

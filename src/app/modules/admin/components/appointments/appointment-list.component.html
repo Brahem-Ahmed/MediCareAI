@@ -14,11 +14,17 @@
         <option value="NO_SHOW">No Show</option>
       </select>
     </div>
-    <button class="btn btn-primary" (click)="scheduleAppointment()">Schedule Appointment</button>
+    <div class="action-row">
+      <button class="btn btn-secondary" (click)="openAvailabilityExplorer()">Availability</button>
+      <button class="btn btn-secondary" (click)="openReminderCenter()">Reminder Center</button>
+      <button class="btn btn-primary" (click)="scheduleAppointment()">Schedule Appointment</button>
+    </div>
   </div>
 
   <div *ngIf="loading" class="loading">Loading appointments...</div>
   <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="actionSuccess" class="success-message">{{ actionSuccess }}</div>
+  <div *ngIf="actionError" class="error-message">{{ actionError }}</div>
 
   <div class="table-container">
     <table class="data-table">
@@ -42,11 +48,58 @@
           <td><span class="badge">{{ appointment.consultationType }}</span></td>
           <td><span class="status-badge status-{{appointment.status}}">{{ appointment.status }}</span></td>
           <td>
-            <button class="btn-icon" (click)="markAsNoShow(appointment.id!)" title="Mark No-Show">No-Show</button>
-            <button class="btn-icon btn-danger" (click)="cancelAppointment(appointment.id!)" title="Cancel">Cancel</button>
+            <div class="table-actions">
+              <button class="btn-icon" (click)="markAsNoShow(appointment.id!)" title="Mark No-Show">No-Show</button>
+              <button class="btn-icon" (click)="openReschedule(appointment)" title="Reschedule">Reschedule</button>
+              <button class="btn-icon" (click)="openReminderScheduler(appointment)" title="Schedule Reminder">Reminder</button>
+              <button class="btn-icon" (click)="sendReminderNow(appointment.id!)" title="Send Reminder Now">Send Now</button>
+              <button class="btn-icon" (click)="openTeleconsultation(appointment.id!)" title="Teleconsultation">Join</button>
+              <button class="btn-icon" (click)="openDetails(appointment.id!)" title="Details">Details</button>
+              <button class="btn-icon btn-danger" (click)="cancelAppointment(appointment.id!)" title="Cancel">Cancel</button>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="panel" *ngIf="rescheduleAppointmentId">
+    <h3>Reschedule Appointment #{{ rescheduleAppointmentId }}</h3>
+    <div class="panel-grid">
+      <div class="form-group">
+        <label>New Start Time</label>
+        <input type="datetime-local" [(ngModel)]="rescheduleStartTime" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>New End Time</label>
+        <input type="datetime-local" [(ngModel)]="rescheduleEndTime" class="form-control" />
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn btn-primary" (click)="submitReschedule()">Confirm Reschedule</button>
+      <button class="btn btn-secondary" (click)="closeReschedule()">Close</button>
+    </div>
+  </div>
+
+  <div class="panel" *ngIf="reminderAppointmentId">
+    <h3>Reminder for Appointment #{{ reminderAppointmentId }}</h3>
+    <div class="panel-grid">
+      <div class="form-group">
+        <label>Reminder Time</label>
+        <input type="datetime-local" [(ngModel)]="reminderAt" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Channel</label>
+        <select [(ngModel)]="reminderChannel" class="form-control">
+          <option value="EMAIL">Email</option>
+          <option value="SMS">SMS</option>
+          <option value="PUSH">Push</option>
+        </select>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn btn-primary" (click)="scheduleReminder()">Schedule Reminder</button>
+      <button class="btn btn-secondary" (click)="closeReminderScheduler()">Close</button>
+    </div>
   </div>
 </div>

@@ -21,3 +21,23 @@ export interface DoctorAvailability {
   blocked?: boolean;
   maxAppointments?: number;
 }
+
+export interface AvailabilityDTO extends DoctorAvailability {}
+
+export interface AppointmentReminderDTO {
+  id?: number;
+  appointmentId: number;
+  remindAt: string;
+  channel?: 'EMAIL' | 'SMS' | 'PUSH';
+  status?: 'SCHEDULED' | 'SENT' | 'FAILED';
+  sentAt?: string;
+}
+
+export interface TeleconsultationSessionDTO {
+  appointmentId: number;
+  roomId?: string;
+  meetingLink?: string;
+  startsAt?: string;
+  endsAt?: string;
+  status?: 'PENDING' | 'LIVE' | 'ENDED';
+}
