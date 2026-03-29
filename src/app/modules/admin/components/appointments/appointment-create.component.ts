@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppointmentService } from '../../../../shared/services/appointment.service';
 import { UserService } from '../../../../shared/services/user.service';
 import { User } from '../../../../shared/models/user.model';
@@ -28,6 +28,7 @@ export class AppointmentCreateComponent implements OnInit {
     private formBuilder: FormBuilder,
     private appointmentService: AppointmentService,
     private userService: UserService,
+    private route: ActivatedRoute,
     private router: Router
   ) {
     this.appointmentForm = this.formBuilder.group({
@@ -44,6 +45,23 @@ export class AppointmentCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.applyPrefillFromQuery();
+  }
+
+  applyPrefillFromQuery(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const doctorId = params.get('doctorId');
+      const startTime = params.get('startTime');
+      const endTime = params.get('endTime');
+      const consultationType = params.get('consultationType');
+
+      this.appointmentForm.patchValue({
+        doctorId: doctorId || this.appointmentForm.value.doctorId,
+        startTime: startTime || this.appointmentForm.value.startTime,
+        endTime: endTime || this.appointmentForm.value.endTime,
+        consultationType: consultationType || this.appointmentForm.value.consultationType
+      });
+    });
   }
 
   loadUsers(): void {
@@ -120,5 +138,9 @@ export class AppointmentCreateComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/admin/appointments']);
+  }
+
+  navigateToAvailability(): void {
+    this.router.navigate(['/appointments/availability']);
   }
 }
