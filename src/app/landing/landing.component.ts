@@ -59,7 +59,7 @@ export class LandingComponent {
       case 'NURSE':
         return '/appointments/dashboard';
       case 'PATIENT':
-        return '/health-tracker/dashboard';
+        return '/patient/dashboard';
       default:
         return '/';
     }

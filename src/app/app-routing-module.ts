@@ -10,10 +10,12 @@ import { HEALTH_TRACKER_ROUTES } from './modules/health-tracker/health-tracker.r
 import { MEDICAL_RECORD_ROUTES } from './modules/medical-record/medical-record.routes';
 import { SYMPTOM_AI_ROUTES } from './modules/symptom-ai/symptom-ai.routes';
 import { USER_AUTH_ROUTES } from './modules/user-auth/user-auth.routes';
+import { PATIENT_ROUTES } from './modules/patient/patient.routes';
 
 const routes: Routes = [
   { path: '', component: LandingComponent },
   ...USER_AUTH_ROUTES,
+  ...PATIENT_ROUTES,
   ...MEDICAL_RECORD_ROUTES,
   ...APPOINTMENTS_SCHEDULING_ROUTES,
   ...SYMPTOM_AI_ROUTES,

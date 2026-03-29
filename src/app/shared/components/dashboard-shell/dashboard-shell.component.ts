@@ -48,6 +48,10 @@ export class DashboardShellComponent {
     return this.currentRole === 'PATIENT' || this.currentRole === 'ADMIN';
   }
 
+  get isPatient(): boolean {
+    return this.currentRole === 'PATIENT';
+  }
+
   get dashboardRoute(): string {
     switch (this.currentRole) {
       case 'ADMIN':
@@ -59,7 +63,7 @@ export class DashboardShellComponent {
       case 'NURSE':
         return '/appointments/dashboard';
       case 'PATIENT':
-        return '/health-tracker/dashboard';
+        return '/patient/dashboard';
       default:
         return '/';
     }
