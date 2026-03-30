@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM node:21-alpine AS build
+FROM node:24-alpine AS build
 
 # Set working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --prefer-offline --no-audit
+RUN npm ci --legacy-peer-deps --prefer-offline --no-audit
 
 # Copy source code
 COPY . .
