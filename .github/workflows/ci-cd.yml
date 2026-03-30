@@ -35,7 +35,7 @@ jobs:
         run: npm run lint --if-present || echo "No lint script found"
 
       - name: Run tests
-        run: ng test --watch=false --browsers=ChromeHeadless --code-coverage
+        run: npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
         env:
           NODE_OPTIONS: --experimental-require-module
 

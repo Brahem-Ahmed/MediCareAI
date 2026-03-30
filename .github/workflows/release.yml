@@ -33,11 +33,9 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Run tests
-        run: ng test --watch=false --browsers=ChromeHeadless
+        run: npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
         env:
           NODE_OPTIONS: --experimental-require-module
-        env:
-          NODE_OPTIONS: --no-experimental-require-module
 
       - name: Build application
         run: npm run build
