@@ -32,8 +32,8 @@ kubectl apply -f k8s/staging/deployment.yaml
 
 # Wait for deployments to be ready
 echo "⏳ Waiting for deployments to be ready..."
-kubectl rollout status deployment/medicare-frontend -n production --timeout=5m
-kubectl rollout status deployment/medicare-frontend-staging -n staging --timeout=5m
+kubectl rollout status deployment/medicareai-frontend -n production --timeout=5m
+kubectl rollout status deployment/medicareai-frontend-staging -n staging --timeout=5m
 
 # Get service information
 echo ""
@@ -42,10 +42,10 @@ echo "✅ Deployment Complete!"
 echo "=========================================="
 echo ""
 echo "Production Service:"
-kubectl get service medicare-frontend -n production
+kubectl get service medicareai-frontend -n production
 echo ""
 echo "Staging Service:"
-kubectl get service medicare-frontend-staging -n staging
+kubectl get service medicareai-frontend-staging -n staging
 echo ""
 
 # Get NodePort information
@@ -60,11 +60,11 @@ echo ""
 # Show pod status
 echo "Pod Status:"
 echo "Production:"
-kubectl get pods -n production -l app=medicare-frontend
+kubectl get pods -n production -l app=medicareai-frontend
 echo ""
 echo "Staging:"
-kubectl get pods -n staging -l app=medicare-frontend-staging
+kubectl get pods -n staging -l app=medicareai-frontend-staging
 echo ""
 
-echo "To check logs: kubectl logs -f deployment/medicare-frontend -n production"
+echo "To check logs: kubectl logs -f deployment/medicareai-frontend -n production"
 echo ""
