@@ -35,7 +35,9 @@ jobs:
         run: npm run lint --if-present || echo "No lint script found"
 
       - name: Run tests
-        run: cross-env NODE_OPTIONS=--experimental-require-module npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        run: ng test --watch=false --browsers=ChromeHeadless --code-coverage
+        env:
+          NODE_OPTIONS: --experimental-require-module
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3

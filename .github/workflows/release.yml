@@ -33,7 +33,9 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Run tests
-        run: cross-env NODE_OPTIONS=--experimental-require-module npm run test -- --watch=false --browsers=ChromeHeadless
+        run: ng test --watch=false --browsers=ChromeHeadless
+        env:
+          NODE_OPTIONS: --experimental-require-module
         env:
           NODE_OPTIONS: --no-experimental-require-module
 

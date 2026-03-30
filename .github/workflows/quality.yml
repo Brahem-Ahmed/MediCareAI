@@ -27,7 +27,9 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Run tests with coverage
-        run: cross-env NODE_OPTIONS=--experimental-require-module npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        run: ng test --watch=false --browsers=ChromeHeadless --code-coverage
+        env:
+          NODE_OPTIONS: --experimental-require-module
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master

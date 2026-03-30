@@ -31,7 +31,9 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Run unit tests
-        run: cross-env NODE_OPTIONS=--experimental-require-module npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        run: ng test --watch=false --browsers=ChromeHeadless --code-coverage
+        env:
+          NODE_OPTIONS: --experimental-require-module
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
