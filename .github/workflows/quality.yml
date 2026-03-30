@@ -32,14 +32,14 @@ jobs:
           NODE_OPTIONS: --experimental-require-module
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
             -Dsonar.projectKey=MediCareAI_Frontend
-            -Dsonar.organization=your-org
+            -Dsonar.organization=brahem-ahmed
             -Dsonar.sources=src
             -Dsonar.exclusions=**/*.spec.ts,**/*.module.ts
             -Dsonar.tests=src
