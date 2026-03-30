@@ -1,0 +1,185 @@
+<div class="sleep-tracker-container">
+  <div class="header-section">
+    <h2>Sleep Tracker</h2>
+    <p class="subtitle">Monitor your sleep patterns and quality</p>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-section">
+        <h4>Log Sleep</h4>
+
+        <div *ngIf="success" class="alert alert-success alert-dismissible fade show">
+          {{ success }}
+        </div>
+
+        <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+          {{ error }}
+        </div>
+
+        <form [formGroup]="sleepForm" (ngSubmit)="onSubmit()">
+          <div class="form-group mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="date"
+              formControlName="date"
+              [class.is-invalid]="submitted && f['date'].errors"
+            />
+            <div *ngIf="submitted && f['date'].errors" class="invalid-feedback d-block">
+              Date is required
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="bedTime" class="form-label">Bed Time</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  id="bedTime"
+                  formControlName="bedTime"
+                  [class.is-invalid]="submitted && f['bedTime'].errors"
+                />
+                <div *ngIf="submitted && f['bedTime'].errors" class="invalid-feedback d-block">
+                  Bed time is required
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="wakeTime" class="form-label">Wake Time</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  id="wakeTime"
+                  formControlName="wakeTime"
+                  [class.is-invalid]="submitted && f['wakeTime'].errors"
+                />
+                <div *ngIf="submitted && f['wakeTime'].errors" class="invalid-feedback d-block">
+                  Wake time is required
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="duration-info">
+            <strong>Sleep Duration: {{ calculateDuration() }} hours</strong>
+            <span *ngIf="isHealthyDuration(calculateDuration())" class="badge bg-success ms-2">Healthy</span>
+            <span *ngIf="!isHealthyDuration(calculateDuration())" class="badge bg-warning ms-2">Not Ideal</span>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="quality" class="form-label">Sleep Quality (1-10)</label>
+            <input
+              type="range"
+              class="form-range"
+              id="quality"
+              formControlName="quality"
+              min="1"
+              max="10"
+              [class.is-invalid]="submitted && f['quality'].errors"
+            />
+            <div class="quality-value">Quality: {{ f['quality'].value || 0 }}/10 - {{ getQualityLabel(f['quality'].value || 0) }}</div>
+            <div *ngIf="submitted && f['quality'].errors" class="invalid-feedback d-block">
+              Sleep quality is required (1-10)
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="disturbances" class="form-label">Disturbances (comma-separated)</label>
+            <input
+              type="text"
+              class="form-control"
+              id="disturbances"
+              formControlName="disturbances"
+              placeholder="e.g., noise, dreams, pain"
+            />
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="notes" class="form-label">Additional Notes</label>
+            <textarea
+              class="form-control"
+              id="notes"
+              formControlName="notes"
+              rows="3"
+              placeholder="Any additional details about your sleep..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="!loading">Log Sleep</span>
+            <span *ngIf="loading">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Logging...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="stats-section">
+        <div class="stat-card">
+          <h5>Average Sleep Duration</h5>
+          <div class="stat-value">{{ averageSleep }} hrs</div>
+          <p class="stat-label">per night</p>
+        </div>
+
+        <div class="stat-card">
+          <h5>Average Sleep Quality</h5>
+          <div class="stat-value" [ngClass]="'text-' + getQualityColor(averageQuality)">{{ averageQuality }}/10</div>
+          <p class="stat-label">{{ getQualityLabel(averageQuality) }}</p>
+        </div>
+
+        <div class="stat-card">
+          <h5>Total Sleep Records</h5>
+          <div class="stat-value">{{ sleepHistory.length }}</div>
+          <p class="stat-label">nights tracked</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-section mt-4">
+    <h4>Sleep History</h4>
+    <div *ngIf="sleepHistory.length > 0; else noData" class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Bed Time</th>
+            <th>Wake Time</th>
+            <th>Duration</th>
+            <th>Quality</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of sleepHistory | slice : 0 : 10">
+            <td>{{ entry.date | date : 'short' }}</td>
+            <td>{{ entry.bedTime }}</td>
+            <td>{{ entry.wakeTime }}</td>
+            <td>
+              <span [class.badge]="true" [ngClass]="isHealthyDuration(entry.totalDuration) ? 'bg-success' : 'bg-warning'">
+                {{ entry.totalDuration }} hrs
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="'bg-' + getQualityColor(entry.quality)">
+                {{ entry.quality }}/10
+              </span>
+            </td>
+            <td>{{ entry.notes || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noData>
+      <div class="alert alert-info">No sleep records yet. Start logging your sleep to see the history.</div>
+    </ng-template>
+  </div>
+</div>

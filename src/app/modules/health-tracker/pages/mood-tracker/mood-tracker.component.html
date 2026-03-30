@@ -1,0 +1,62 @@
+<div class="mood-tracker-container">
+  <div class="form-section">
+    <h2>Log Your Mood</h2>
+    <form [formGroup]="moodForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="mood">How are you feeling?</label>
+        <select id="mood" formControlName="mood" class="form-control">
+          <option *ngFor="let option of moodOptions" [value]="option">{{ option }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="intensity">Intensity (1-10)</label>
+        <input 
+          type="range" 
+          id="intensity" 
+          formControlName="intensity" 
+          min="1" 
+          max="10" 
+          class="form-control"
+        />
+        <span>{{ moodForm.get('intensity')?.value }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" formControlName="notes" class="form-control" rows="3"></textarea>
+      </div>
+
+      <button type="submit" [disabled]="loading" class="btn btn-primary">
+        {{ loading ? 'Logging...' : 'Log Mood' }}
+      </button>
+
+      <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    </form>
+  </div>
+
+  <div class="history-section">
+    <h2>Mood History (7 Days)</h2>
+
+    <div *ngIf="moodHistoryWithAnalytics" class="analytics">
+      <p>Average Mood: {{ moodHistoryWithAnalytics.average?.toFixed(1) || 'N/A' }}</p>
+      <p>Trend: {{ moodHistoryWithAnalytics.trend || 'Stable' }}</p>
+    </div>
+
+    <div *ngIf="!loading && moodHistory.length === 0" class="empty-state">
+      <p>No mood entries yet. Start logging your mood!</p>
+    </div>
+
+    <div *ngIf="loading" class="loading">Loading...</div>
+
+    <div *ngFor="let entry of moodHistory" class="mood-entry">
+      <div class="entry-header">
+        <strong>{{ entry.mood }}</strong>
+        <span class="intensity">Intensity: {{ entry.intensity }}/10</span>
+        <button (click)="deleteMood(entry.id)" class="btn btn-sm btn-danger">Delete</button>
+      </div>
+      <p *ngIf="entry.notes" class="notes">{{ entry.notes }}</p>
+      <small class="timestamp">{{ entry.timestamp | date: 'short' }}</small>
+    </div>
+  </div>
+</div>

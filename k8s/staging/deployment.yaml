@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medicare-frontend
+  namespace: staging
+  labels:
+    app: medicare-frontend
+    environment: staging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: medicare-frontend
+  template:
+    metadata:
+      labels:
+        app: medicare-frontend
+        environment: staging
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/brahem-ahmed/esprit-pidev_se-4se1-2526-medicareaifront:develop
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        env:
+        - name: ENVIRONMENT
+          value: "staging"
+        - name: API_URL
+          value: "https://api-staging.example.com"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: medicare-frontend
+  namespace: staging
+  labels:
+    app: medicare-frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: medicare-frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: medicare-frontend
+  namespace: staging
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: medicare-frontend
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

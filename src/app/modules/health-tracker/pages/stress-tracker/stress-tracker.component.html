@@ -1,0 +1,118 @@
+<div class="stress-tracker-container">
+  <div class="header-section">
+    <h2>Stress Level Tracker</h2>
+    <p class="subtitle">Monitor and track your daily stress levels</p>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-section">
+        <h4>Record Stress Level</h4>
+
+        <div *ngIf="success" class="alert alert-success alert-dismissible fade show">
+          {{ success }}
+        </div>
+
+        <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+          {{ error }}
+        </div>
+
+        <form [formGroup]="stressForm" (ngSubmit)="onSubmit()">
+          <div class="form-group mb-3">
+            <label for="stressLevel" class="form-label">Stress Level (1-10)</label>
+            <input
+              type="range"
+              class="form-range"
+              id="stressLevel"
+              formControlName="stressLevel"
+              min="1"
+              max="10"
+              [class.is-invalid]="submitted && f['stressLevel'].errors"
+            />
+            <div class="stress-value">Current: {{ f['stressLevel'].value || 0 }} - {{ getStressLabel(f['stressLevel'].value || 0) }}</div>
+            <div *ngIf="submitted && f['stressLevel'].errors" class="invalid-feedback d-block">
+              Stress level is required (1-10)
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="triggers" class="form-label">Stress Triggers (comma-separated)</label>
+            <input
+              type="text"
+              class="form-control"
+              id="triggers"
+              formControlName="triggers"
+              placeholder="e.g., work, sleep deprivation, family"
+            />
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="notes" class="form-label">Additional Notes</label>
+            <textarea
+              class="form-control"
+              id="notes"
+              formControlName="notes"
+              rows="3"
+              placeholder="Any additional details about your stress level..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="!loading">Record Stress Level</span>
+            <span *ngIf="loading">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Recording...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="stats-section">
+        <div class="stat-card">
+          <h5>Average Stress Level</h5>
+          <div class="stat-value" [ngClass]="'text-' + getStressColor(averageStress)">{{ averageStress }}/10</div>
+          <p class="stat-label">{{ getStressLabel(averageStress) }}</p>
+        </div>
+
+        <div class="stat-card">
+          <h5>Total Recordings</h5>
+          <div class="stat-value">{{ stressHistory.length }}</div>
+          <p class="stat-label">Stress entries tracked</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-section mt-4">
+    <h4>Recent Stress Entries</h4>
+    <div *ngIf="stressHistory.length > 0; else noData" class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Level</th>
+            <th>Triggers</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of stressHistory | slice : 0 : 10">
+            <td>{{ entry.timestamp | date : 'short' }}</td>
+            <td>
+              <span class="badge" [ngClass]="'bg-' + getStressColor(entry.level)">
+                {{ entry.level }}/10 - {{ getStressLabel(entry.level) }}
+              </span>
+            </td>
+            <td>{{ entry.triggers?.join(', ') || '-' }}</td>
+            <td>{{ entry.notes || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noData>
+      <div class="alert alert-info">No stress entries yet. Start recording your stress levels to see the history.</div>
+    </ng-template>
+  </div>
+</div>

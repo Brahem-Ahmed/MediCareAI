@@ -1,0 +1,128 @@
+<div class="wellness-dashboard-container">
+  <div class="header-section">
+    <h2>Wellness Dashboard</h2>
+    <p class="subtitle">Your comprehensive health overview</p>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Overall Wellness Score -->
+    <div class="wellness-score-section">
+      <div class="wellness-score-card">
+        <div class="score-circle" [ngClass]="'bg-' + getWellnessColor()">
+          <div class="score-value">{{ wellnessScore }}</div>
+          <div class="score-label">Wellness Score</div>
+          <div class="score-status">{{ getWellnessStatus() }}</div>
+        </div>
+      </div>
+
+      <!-- Health Metrics Cards -->
+      <div class="row mt-4">
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon">😊</div>
+            <div class="metric-name">Mood</div>
+            <div class="metric-value">{{ healthStats.moodScore }}/10</div>
+            <div class="metric-label">{{ getMoodLabel(healthStats.moodScore) }}</div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon">😰</div>
+            <div class="metric-name">Stress</div>
+            <div class="metric-value">{{ healthStats.stressLevel }}/10</div>
+            <div class="metric-label">{{ getStressLabel(healthStats.stressLevel) }}</div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon">😴</div>
+            <div class="metric-name">Sleep Quality</div>
+            <div class="metric-value">{{ healthStats.sleepQuality }}/10</div>
+            <div class="metric-label">{{ getSleepLabel(healthStats.sleepQuality) }}</div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon">⚡</div>
+            <div class="metric-name">Activity</div>
+            <div class="metric-value">{{ formatActivityDuration(healthStats.activityMinutes) }}</div>
+            <div class="metric-label">{{ healthStats.caloriesBurned }} kcal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div class="recommendations-section mt-5">
+      <div class="recommendations-card">
+        <h4>Health Recommendations</h4>
+        <div class="recommendations-list">
+          <div *ngFor="let rec of recommendations" class="recommendation-item">
+            <span class="recommendation-icon">💡</span>
+            <span class="recommendation-text">{{ rec }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activities Section -->
+    <div class="activities-section mt-5">
+      <div class="activities-card">
+        <h4>Recent Activities</h4>
+        <div *ngIf="recentActivities.length > 0; else noActivities" class="activities-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-type">{{ activity.type }}</div>
+            <div class="activity-details">
+              <span class="activity-duration">{{ formatActivityDuration(activity.duration) }}</span>
+              <span class="activity-calories">{{ activity.caloriesBurned || '-' }} kcal</span>
+            </div>
+            <div class="activity-time">{{ activity.timestamp | date : 'short' }}</div>
+          </div>
+        </div>
+        <ng-template #noActivities>
+          <div class="alert alert-info">No recent activities. Start logging activities to track your fitness!</div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Quick Links Section -->
+    <div class="quick-links-section mt-5">
+      <h4>Quick Links</h4>
+      <div class="row">
+        <div class="col-md-3">
+          <a routerLink="/health-tracker/pages/mood-tracker" class="quick-link-card">
+            <div class="link-icon">😊</div>
+            <div class="link-label">Mood Tracker</div>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a routerLink="/health-tracker/pages/stress-tracker" class="quick-link-card">
+            <div class="link-icon">😰</div>
+            <div class="link-label">Stress Tracker</div>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a routerLink="/health-tracker/pages/sleep-tracker" class="quick-link-card">
+            <div class="link-icon">😴</div>
+            <div class="link-label">Sleep Tracker</div>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a routerLink="/health-tracker/pages/activity-tracker" class="quick-link-card">
+            <div class="link-icon">⚡</div>
+            <div class="link-label">Activity Tracker</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

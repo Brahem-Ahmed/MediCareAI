@@ -1,0 +1,165 @@
+<div class="activity-tracker-container">
+  <div class="header-section">
+    <h2>Activity Tracker</h2>
+    <p class="subtitle">Log and monitor your physical activities</p>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-section">
+        <h4>Log Activity</h4>
+
+        <div *ngIf="success" class="alert alert-success alert-dismissible fade show">
+          {{ success }}
+        </div>
+
+        <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+          {{ error }}
+        </div>
+
+        <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
+          <div class="form-group mb-3">
+            <label for="type" class="form-label">Activity Type</label>
+            <select
+              class="form-select"
+              id="type"
+              formControlName="type"
+              [class.is-invalid]="submitted && f['type'].errors"
+            >
+              <option value="">Select an activity</option>
+              <option *ngFor="let type of activityTypes" [value]="type">
+                {{ getActivityIcon(type) }} {{ type }}
+              </option>
+            </select>
+            <div *ngIf="submitted && f['type'].errors" class="invalid-feedback d-block">
+              Activity type is required
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="duration"
+              formControlName="duration"
+              placeholder="Enter duration in minutes"
+              min="1"
+              max="1440"
+              [class.is-invalid]="submitted && f['duration'].errors"
+            />
+            <div *ngIf="submitted && f['duration'].errors" class="invalid-feedback d-block">
+              Duration is required (1-1440 minutes)
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="intensity" class="form-label">Intensity</label>
+                <select class="form-select" id="intensity" formControlName="intensity">
+                  <option *ngFor="let level of intensityLevels" [value]="level">
+                    {{ level }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="distance" class="form-label">Distance (km)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="distance"
+                  formControlName="distance"
+                  placeholder="Optional"
+                  step="0.1"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="calories-info">
+            <strong>Estimated Calories Burned: {{ calculateCalories() }} kcal</strong>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea
+              class="form-control"
+              id="notes"
+              formControlName="notes"
+              rows="2"
+              placeholder="Any additional details..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="!loading">Log Activity</span>
+            <span *ngIf="loading">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Logging...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="stats-section">
+        <div class="stat-card">
+          <h5>Total Activity Time</h5>
+          <div class="stat-value">{{ formatDuration(totalDuration) }}</div>
+          <p class="stat-label">in the last 30 days</p>
+        </div>
+
+        <div class="stat-card">
+          <h5>Total Calories Burned</h5>
+          <div class="stat-value">{{ totalCalories }}</div>
+          <p class="stat-label">kcal burned</p>
+        </div>
+
+        <div class="stat-card">
+          <h5>Total Activities</h5>
+          <div class="stat-value">{{ activityHistory.length }}</div>
+          <p class="stat-label">activities logged</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-section mt-4">
+    <h4>Activity History</h4>
+    <div *ngIf="activityHistory.length > 0; else noData" class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Activity</th>
+            <th>Duration</th>
+            <th>Intensity</th>
+            <th>Calories</th>
+            <th>Distance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of activityHistory | slice : 0 : 15">
+            <td>{{ entry.timestamp | date : 'short' }}</td>
+            <td>{{ getActivityIcon(entry.type) }} {{ entry.type }}</td>
+            <td>{{ formatDuration(entry.duration) }}</td>
+            <td>
+              <span class="badge" [ngClass]="'bg-' + (entry.intensity === 'LOW' ? 'info' : entry.intensity === 'MODERATE' ? 'warning' : 'danger')">
+                {{ entry.intensity }}
+              </span>
+            </td>
+            <td>{{ entry.caloriesBurned || '-' }} kcal</td>
+            <td>{{ entry.distance || '-' }} km</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noData>
+      <div class="alert alert-info">No activities logged yet. Start logging your activities to see the history.</div>
+    </ng-template>
+  </div>
+</div>
