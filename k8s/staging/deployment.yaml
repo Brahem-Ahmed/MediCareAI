@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/brahem-ahmed/esprit-pidev_se-4se1-2526-medicareaifront:latest
+        image: brahemahmed/medicareaifront:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
