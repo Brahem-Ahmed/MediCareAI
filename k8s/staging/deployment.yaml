@@ -1,25 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: medicare-frontend
+  name: medicare-frontend-staging
   namespace: staging
   labels:
     app: medicare-frontend
     environment: staging
 spec:
-  replicas: 2
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
-      app: medicare-frontend
+      app: medicare-frontend-staging
   template:
     metadata:
       labels:
-        app: medicare-frontend
+        app: medicare-frontend-staging
         environment: staging
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/brahem-ahmed/esprit-pidev_se-4se1-2526-medicareaifront:develop
+        image: ghcr.io/brahem-ahmed/esprit-pidev_se-4se1-2526-medicareaifront:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -37,57 +42,64 @@ spec:
             port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /index.html
+            path: /health
             port: 80
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
-        env:
-        - name: ENVIRONMENT
-          value: "staging"
-        - name: API_URL
-          value: "https://api-staging.example.com"
+          timeoutSeconds: 3
+          failureThreshold: 2
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config-staging
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: medicare-frontend
+  name: medicare-frontend-staging
   namespace: staging
   labels:
     app: medicare-frontend
 spec:
-  type: LoadBalancer
-  selector:
-    app: medicare-frontend
+  type: NodePort
   ports:
-  - protocol: TCP
-    port: 80
+  - port: 80
     targetPort: 80
+    protocol: TCP
+    nodePort: 30081
     name: http
+  selector:
+    app: medicare-frontend-staging
+
 ---
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: medicare-frontend
+  name: medicare-frontend-staging
   namespace: staging
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
 spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: medicare-frontend
-  minReplicas: 2
-  maxReplicas: 5
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+  ingressClassName: nginx
+  rules:
+  - host: staging-medicare.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: medicare-frontend-staging
+            port:
+              number: 80
