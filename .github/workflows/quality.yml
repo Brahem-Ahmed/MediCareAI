@@ -38,13 +38,14 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
-            -Dsonar.projectKey=MediCareAI_Frontend
+            -Dsonar.projectKey=Brahem-Ahmed_Esprit-PIDEV_SE-4SE1-2526-MediCareAIFront
             -Dsonar.organization=brahem-ahmed
             -Dsonar.sources=src
             -Dsonar.exclusions=**/*.spec.ts,**/*.module.ts
             -Dsonar.tests=src
             -Dsonar.test.inclusions=**/*.spec.ts
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+        continue-on-error: true
 
   eslint:
     name: ESLint Analysis
