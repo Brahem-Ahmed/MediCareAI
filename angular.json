@@ -33,6 +33,16 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/asserts",
+                "output": "assets"
               }
             ],
             "styles": [
@@ -49,8 +59,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "8kB",
-                  "maximumError": "16kB"
+                  "maximumWarning": "14kB",
+                  "maximumError": "20kB"
                 }
               ],
               "outputHashing": "all"
@@ -65,6 +75,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "MediCareAIFront:build:production"

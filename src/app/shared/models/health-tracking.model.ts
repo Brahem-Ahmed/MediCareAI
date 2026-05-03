@@ -6,10 +6,9 @@
 export interface Mood {
   id?: number;
   userId: number;
-  mood: 'HAPPY' | 'SAD' | 'ANXIOUS' | 'CALM' | 'FRUSTRATED' | 'CONTENT' | 'NEUTRAL';
-  intensity: number; // 1-10 scale
-  notes?: string;
-  timestamp: string;
+  level: number; // 1-10 scale
+  note?: string;
+  date: string;
   createdAt?: string;
 }
 
@@ -43,12 +42,9 @@ export interface StressHistory {
 export interface Sleep {
   id?: number;
   userId: number;
-  duration: number; // hours
+  hours: number; // 0.5 - 24
   quality: number; // 1-10 scale
-  notes?: string;
-  sleepStart: string;
-  sleepEnd: string;
-  timestamp: string;
+  date: string; // YYYY-MM-DD
   createdAt?: string;
 }
 
@@ -102,6 +98,7 @@ export interface ActivityHistory {
 }
 
 export interface WellnessMetrics {
+  id?: number;
   userId: number;
   date?: string;
   
@@ -146,8 +143,28 @@ export interface WellnessMetrics {
   
   // Health recommendations
   recommendations: string[];
-  alerts?: string[]; // Critical alerts
+  alerts?: HealthAlert[]; // Critical alerts
   lastUpdated: string;
+}
+
+export type HealthAlertLevel = 'INFO' | 'WARNING' | 'URGENT';
+
+export interface HealthAlert {
+  id: number;
+  message: string;
+  level: HealthAlertLevel;
+  ignored: boolean;
+  recommendation: string;
+  activity: string;
+}
+
+export interface WellBeingMetric {
+  id?: number;
+  start_date: string;
+  end_date: string;
+  frequency: string;
+  level: string;
+  createdAt?: string;
 }
 
 export interface HealthEventType {
@@ -209,5 +226,68 @@ export interface AiRecommendation {
   actionItems?: string[];
   validFrom?: string;
   validUntil?: string;
+  createdAt?: string;
+}
+
+export interface PregnancyCheckup {
+  id?: number;
+  date: string;
+  observation: string;
+  weightKg?: number;
+  symptoms?: string;
+  fetalMovements?: number;
+  pregnancyTrackingId: number;
+  createdAt?: string;
+}
+
+export interface MedicationSchedule {
+  id?: number;
+  userId: number;
+  medicineName: string;
+  dosage: string;
+  frequency: string; // e.g., "twice daily", "every 8 hours"
+  startDate: string;
+  endDate?: string;
+  recordDate: string;
+  createdAt?: string;
+}
+
+export interface Recommendation {
+  id?: number;
+  userId: number;
+  type: 'HEALTH' | 'NUTRITION' | 'EXERCISE' | 'MENTAL_HEALTH' | 'GENERAL';
+  title: string;
+  description: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  category?: string;
+  source?: string; // e.g., "AI", "Doctor", "System"
+  validUntil?: string;
+  completed?: boolean;
+  completedAt?: string;
+  createdAt?: string;
+}
+
+export interface MedicationReminder {
+  id?: number;
+  time: string;
+  message: string;
+  medicationScheduleId: number;
+  createdAt?: string;
+}
+
+export interface PregnancyTracking {
+  id?: number;
+  userId: number;
+  startDate: string;
+  dueDate: string;
+  currentWeek: number;
+  notes?: string;
+  trimester?: 1 | 2 | 3;
+  symptoms?: string[];
+  weight?: number;
+  bellySize?: number;
+  kickCount?: number;
+  mood?: string;
+  lastUpdated?: string;
   createdAt?: string;
 }

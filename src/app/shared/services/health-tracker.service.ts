@@ -1,378 +1,294 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import {
-  Mood,
-  MoodHistory,
-  Stress,
-  StressHistory,
-  Sleep,
-  SleepHistory,
-  Activity,
-  ActivityHistory,
-  WellnessMetrics,
-  HealthEvent,
-  HealthGoal,
-  HealthReport,
-  AiRecommendation
-} from '../models/health-tracking.model';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { HealthAlert, PregnancyCheckup, PregnancyTracking, WellBeingMetric } from '../models/health-tracking.model';
+
+type HealthTrackerPayload = {
+  id?: number;
+  userId?: number;
+  [key: string]: unknown;
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class HealthTrackerService {
-  private baseUrl = environment.apiUrl.replace(/\/+$/, '');
-  private moodsUrl = `${this.baseUrl}/moods`;
-  private stressUrl = `${this.baseUrl}/stresss`; // Note: Backend has typo
-  private sleepsUrl = `${this.baseUrl}/sleeps`;
-  private activitiesUrl = `${this.baseUrl}/activities`;
-  private wellnessUrl = `${this.baseUrl}/well-being-metrics`;
-  private healthEventsUrl = `${this.baseUrl}/health-events`;
-  private healthGoalsUrl = `${this.baseUrl}/health-goals`;
-  private healthReportsUrl = `${this.baseUrl}/health-reports`;
-  private recommendationsUrl = `${this.baseUrl}/recommendations`;
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = environment.apiUrl.replace(/\/+$/, '');
 
-  constructor(private http: HttpClient) {}
+  private readonly moodsUrl = `${this.baseUrl}/moods`;
+  private readonly stressUrl = `${this.baseUrl}/stresss`;
+  private readonly sleepsUrl = `${this.baseUrl}/sleeps`;
+  private readonly activitiesUrl = `${this.baseUrl}/activities`;
+  private readonly wellBeingMetricsUrl = `${this.baseUrl}/well-being-metrics`;
+  private readonly medicationRemindersUrl = `${this.baseUrl}/medication-reminders`;
+  private readonly medicationSchedulesUrl = `${this.baseUrl}/medication-schedules`;
+  private readonly pregnancyTrackingsUrl = `${this.baseUrl}/pregnancy-trackings`;
+  private readonly pregnancyCheckupsUrl = `${this.baseUrl}/pregnancy-checkups`;
+  private readonly alertsUrl = `${this.baseUrl}/alerts`;
 
-  // ==================== MOOD TRACKING ====================
+  // ==================== MOOD ====================
 
-  /**
-   * Log mood entry
-   */
-  logMood(mood: Mood): Observable<Mood> {
-    return this.http.post<Mood>(this.moodsUrl, mood);
+  logMood(payload: any): Observable<HealthTrackerPayload> {
+    return this.http.post<HealthTrackerPayload>(this.moodsUrl, payload);
   }
 
-  /**
-   * Get mood history
-   */
-  getMoodHistory(userId: number, dateRange: string = '7d'): Observable<Mood[]> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<Mood[]>(this.moodsUrl, { params });
+  getMoodHistory(userId: number, _dateRange: string = '7d'): Observable<HealthTrackerPayload[]> {
+    // Swagger: GET /moods/user/{userId}
+    return this.http.get<HealthTrackerPayload[]>(`${this.moodsUrl}/user/${userId}`);
   }
 
-  /**
-   * Get mood history with analytics
-   */
-  getMoodHistoryWithAnalytics(userId: number, dateRange: string = '7d'): Observable<MoodHistory> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<MoodHistory>(`${this.moodsUrl}/analytics`, { params });
+  getAllMoods(): Observable<HealthTrackerPayload[]> {
+    return this.http.get<HealthTrackerPayload[]>(this.moodsUrl);
   }
 
-  /**
-   * Get specific mood entry
-   */
-  getMoodById(id: number): Observable<Mood> {
-    return this.http.get<Mood>(`${this.moodsUrl}/${id}`);
+  getMoodById(id: number): Observable<HealthTrackerPayload> {
+    return this.http.get<HealthTrackerPayload>(`${this.moodsUrl}/${id}`);
   }
 
-  /**
-   * Delete mood entry
-   */
+  updateMood(payload: any): Observable<HealthTrackerPayload> {
+    if (!payload.id) {
+      throw new Error('Mood id is required for update');
+    }
+
+    const { id, ...body } = payload;
+    return this.http.put<HealthTrackerPayload>(`${this.moodsUrl}/${id}`, body);
+  }
+
   deleteMood(id: number): Observable<void> {
     return this.http.delete<void>(`${this.moodsUrl}/${id}`);
   }
 
-  // ==================== STRESS TRACKING ====================
+  // ==================== STRESS ====================
 
-  /**
-   * Log stress level
-   */
-  logStress(stress: Stress): Observable<Stress> {
-    return this.http.post<Stress>(this.stressUrl, stress);
+  logStress(payload: any): Observable<HealthTrackerPayload> {
+    console.log('HealthTrackerService.logStress - Sending to:', this.stressUrl);
+    console.log('Payload:', JSON.stringify(payload, null, 2));
+    return this.http.post<HealthTrackerPayload>(this.stressUrl, payload).pipe(
+      // Log response for debugging
+      map((response) => {
+        console.log('Stress response:', response);
+        return response;
+      })
+    );
   }
 
-  /**
-   * Get stress history
-   */
-  getStressHistory(userId: number, dateRange: string = '7d'): Observable<Stress[]> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<Stress[]>(this.stressUrl, { params });
+  getStressHistory(userId: number, _dateRange: string = '7d'): Observable<HealthTrackerPayload[]> {
+    // Swagger list does not expose a user-specific endpoint for Stress,
+    // so we fetch all and filter client-side.
+    return this.getAllStress().pipe(map((items) => items.filter((item) => Number(item.userId) === Number(userId))));
   }
 
-  /**
-   * Get stress history with analytics
-   */
-  getStressHistoryWithAnalytics(userId: number, dateRange: string = '7d'): Observable<StressHistory> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<StressHistory>(`${this.stressUrl}/analytics`, { params });
+  getAllStress(): Observable<HealthTrackerPayload[]> {
+    return this.http.get<HealthTrackerPayload[]>(this.stressUrl);
   }
 
-  /**
-   * Get specific stress entry
-   */
-  getStressById(id: number): Observable<Stress> {
-    return this.http.get<Stress>(`${this.stressUrl}/${id}`);
+  getStressById(id: number): Observable<HealthTrackerPayload> {
+    return this.http.get<HealthTrackerPayload>(`${this.stressUrl}/${id}`);
   }
 
-  /**
-   * Delete stress entry
-   */
+  updateStress(payload: any): Observable<HealthTrackerPayload> {
+    if (!payload.id) {
+      throw new Error('Stress id is required for update');
+    }
+
+    const { id, ...body } = payload;
+    return this.http.put<HealthTrackerPayload>(`${this.stressUrl}/${id}`, body);
+  }
+
   deleteStress(id: number): Observable<void> {
     return this.http.delete<void>(`${this.stressUrl}/${id}`);
   }
 
-  // ==================== SLEEP TRACKING ====================
+  // ==================== SLEEP ====================
 
-  /**
-   * Log sleep data
-   */
-  logSleep(sleep: Sleep): Observable<Sleep> {
-    return this.http.post<Sleep>(this.sleepsUrl, sleep);
+  logSleep(payload: any): Observable<HealthTrackerPayload> {
+    return this.http.post<HealthTrackerPayload>(this.sleepsUrl, payload);
   }
 
-  /**
-   * Get sleep history
-   */
-  getSleepHistory(userId: number, dateRange: string = '7d'): Observable<Sleep[]> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<Sleep[]>(this.sleepsUrl, { params });
+  getSleepHistory(userId: number, _dateRange: string = '7d'): Observable<HealthTrackerPayload[]> {
+    // Swagger list does not expose a user-specific endpoint for Sleep,
+    // so we fetch all and filter client-side.
+    return this.getAllSleeps().pipe(map((items) => items.filter((item) => Number(item.userId) === Number(userId))));
   }
 
-  /**
-   * Get sleep history with analytics
-   */
-  getSleepHistoryWithAnalytics(userId: number, dateRange: string = '7d'): Observable<SleepHistory> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<SleepHistory>(`${this.sleepsUrl}/analytics`, { params });
+  getAllSleeps(): Observable<HealthTrackerPayload[]> {
+    return this.http.get<HealthTrackerPayload[]>(this.sleepsUrl);
   }
 
-  /**
-   * Get specific sleep entry
-   */
-  getSleepById(id: number): Observable<Sleep> {
-    return this.http.get<Sleep>(`${this.sleepsUrl}/${id}`);
+  getSleepById(id: number): Observable<HealthTrackerPayload> {
+    return this.http.get<HealthTrackerPayload>(`${this.sleepsUrl}/${id}`);
   }
 
-  /**
-   * Delete sleep entry
-   */
+  updateSleep(payload: any): Observable<HealthTrackerPayload> {
+    if (!payload.id) {
+      throw new Error('Sleep id is required for update');
+    }
+
+    const { id, ...body } = payload;
+    return this.http.put<HealthTrackerPayload>(`${this.sleepsUrl}/${id}`, body);
+  }
+
   deleteSleep(id: number): Observable<void> {
     return this.http.delete<void>(`${this.sleepsUrl}/${id}`);
   }
 
-  // ==================== ACTIVITY TRACKING ====================
+  // ==================== ACTIVITY ====================
 
-  /**
-   * Log activity
-   */
-  logActivity(activity: Activity): Observable<Activity> {
-    return this.http.post<Activity>(this.activitiesUrl, activity);
+  logActivity(payload: any): Observable<HealthTrackerPayload> {
+    return this.http.post<HealthTrackerPayload>(this.activitiesUrl, payload);
   }
 
-  /**
-   * Get activity history
-   */
-  getActivityHistory(userId: number, dateRange: string = '7d'): Observable<Activity[]> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<Activity[]>(this.activitiesUrl, { params });
+  getActivityHistory(userId: number, _dateRange: string = '7d'): Observable<HealthTrackerPayload[]> {
+    // Keep the API surface compatible with older UI code; backend swagger does not list a user-specific activity endpoint.
+    return this.getAllActivities().pipe(map((items) => items.filter((item) => Number(item.userId) === Number(userId))));
   }
 
-  /**
-   * Get activity history with analytics
-   */
-  getActivityHistoryWithAnalytics(userId: number, dateRange: string = '7d'): Observable<ActivityHistory> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('dateRange', dateRange);
-
-    return this.http.get<ActivityHistory>(`${this.activitiesUrl}/analytics`, { params });
+  getAllActivities(): Observable<HealthTrackerPayload[]> {
+    return this.http.get<HealthTrackerPayload[]>(this.activitiesUrl);
   }
 
-  /**
-   * Get specific activity entry
-   */
-  getActivityById(id: number): Observable<Activity> {
-    return this.http.get<Activity>(`${this.activitiesUrl}/${id}`);
+  getActivityById(id: number): Observable<HealthTrackerPayload> {
+    return this.http.get<HealthTrackerPayload>(`${this.activitiesUrl}/${id}`);
   }
 
-  /**
-   * Delete activity entry
-   */
+  updateActivity(payload: HealthTrackerPayload): Observable<HealthTrackerPayload> {
+    if (!payload.id) {
+      throw new Error('Activity id is required for update');
+    }
+
+    const { id, ...body } = payload;
+    return this.http.put<HealthTrackerPayload>(`${this.activitiesUrl}/${id}`, body);
+  }
+
   deleteActivity(id: number): Observable<void> {
     return this.http.delete<void>(`${this.activitiesUrl}/${id}`);
   }
 
-  // ==================== WELLNESS METRICS ====================
+  // ==================== WELL-BEING METRICS ====================
 
-  /**
-   * Get wellness metrics for a user
-   */
-  getWellnessMetrics(userId: number): Observable<WellnessMetrics> {
-    return this.http.get<WellnessMetrics>(`${this.wellnessUrl}/${userId}`);
+  getWellBeingMetrics(): Observable<WellBeingMetric[]> {
+    return this.http.get<WellBeingMetric[]>(this.wellBeingMetricsUrl);
   }
 
-  /**
-   * Get wellness metrics for current user
-   */
-  getCurrentUserWellnessMetrics(): Observable<WellnessMetrics> {
-    return this.http.get<WellnessMetrics>(`${this.wellnessUrl}/me`);
+  getWellBeingMetricById(id: number): Observable<WellBeingMetric> {
+    return this.http.get<WellBeingMetric>(`${this.wellBeingMetricsUrl}/${id}`);
   }
 
-  /**
-   * Get wellness trends
-   */
-  getWellnessTrends(userId: number, period: '7d' | '30d' | '90d' = '30d'): Observable<any> {
-    const params = new HttpParams().set('period', period);
-    return this.http.get<any>(`${this.wellnessUrl}/${userId}/trends`, { params });
+  createWellBeingMetric(payload: HealthTrackerPayload): Observable<WellBeingMetric> {
+    return this.http.post<WellBeingMetric>(this.wellBeingMetricsUrl, payload as Record<string, unknown>);
   }
 
-  // ==================== HEALTH EVENTS ====================
-
-  /**
-   * Create health event
-   */
-  createHealthEvent(event: HealthEvent): Observable<HealthEvent> {
-    return this.http.post<HealthEvent>(this.healthEventsUrl, event);
+  updateWellBeingMetric(id: number, payload: HealthTrackerPayload): Observable<WellBeingMetric> {
+    return this.http.put<WellBeingMetric>(`${this.wellBeingMetricsUrl}/${id}`, payload as Record<string, unknown>);
   }
 
-  /**
-   * Get health events for a user
-   */
-  getHealthEvents(userId: number, limit: number = 10): Observable<HealthEvent[]> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('limit', limit.toString());
-
-    return this.http.get<HealthEvent[]>(this.healthEventsUrl, { params });
+  deleteWellBeingMetric(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.wellBeingMetricsUrl}/${id}`);
   }
 
-  /**
-   * Get critical health alerts
-   */
-  getCriticalAlerts(userId: number): Observable<HealthEvent[]> {
-    const params = new HttpParams().set('userId', userId.toString());
-    return this.http.get<HealthEvent[]>(`${this.healthEventsUrl}/critical`, { params });
+  // ==================== MEDICATION REMINDERS ====================
+
+  getMedicationReminders(): Observable<HealthTrackerPayload[]> {
+    return this.http.get<HealthTrackerPayload[]>(this.medicationRemindersUrl);
   }
 
-  /**
-   * Acknowledge health event
-   */
-  acknowledgeHealthEvent(eventId: number): Observable<void> {
-    return this.http.post<void>(`${this.healthEventsUrl}/${eventId}/acknowledge`, {});
+  createMedicationReminder(payload: HealthTrackerPayload): Observable<HealthTrackerPayload> {
+    return this.http.post<HealthTrackerPayload>(this.medicationRemindersUrl, payload);
   }
 
-  // ==================== HEALTH GOALS ====================
+  updateMedicationReminder(payload: HealthTrackerPayload): Observable<HealthTrackerPayload> {
+    if (!payload.id) {
+      throw new Error('Medication reminder id is required for update');
+    }
 
-  /**
-   * Create health goal
-   */
-  createHealthGoal(goal: HealthGoal): Observable<HealthGoal> {
-    return this.http.post<HealthGoal>(this.healthGoalsUrl, goal);
+    const { id, ...body } = payload;
+    return this.http.put<HealthTrackerPayload>(`${this.medicationRemindersUrl}/${id}`, body);
   }
 
-  /**
-   * Get user health goals
-   */
-  getUserHealthGoals(userId: number): Observable<HealthGoal[]> {
-    const params = new HttpParams().set('userId', userId.toString());
-    return this.http.get<HealthGoal[]>(this.healthGoalsUrl, { params });
+  deleteMedicationReminder(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.medicationRemindersUrl}/${id}`);
   }
 
-  /**
-   * Update health goal
-   */
-  updateHealthGoal(id: number, goal: Partial<HealthGoal>): Observable<HealthGoal> {
-    return this.http.put<HealthGoal>(`${this.healthGoalsUrl}/${id}`, goal);
+  // ==================== MEDICATION SCHEDULES ====================
+
+  getMedicationSchedules(): Observable<HealthTrackerPayload[]> {
+    return this.http.get<HealthTrackerPayload[]>(this.medicationSchedulesUrl);
   }
 
-  /**
-   * Delete health goal
-   */
-  deleteHealthGoal(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.healthGoalsUrl}/${id}`);
+  createMedicationSchedule(payload: HealthTrackerPayload): Observable<HealthTrackerPayload> {
+    return this.http.post<HealthTrackerPayload>(this.medicationSchedulesUrl, payload);
   }
 
-  // ==================== HEALTH REPORTS ====================
+  updateMedicationSchedule(payload: HealthTrackerPayload): Observable<HealthTrackerPayload> {
+    if (!payload.id) {
+      throw new Error('Medication schedule id is required for update');
+    }
 
-  /**
-   * Generate health report
-   */
-  generateHealthReport(userId: number, period: '7d' | '30d' | '90d'): Observable<HealthReport> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('period', period);
-
-    return this.http.get<HealthReport>(this.healthReportsUrl, { params });
+    const { id, ...body } = payload;
+    return this.http.put<HealthTrackerPayload>(`${this.medicationSchedulesUrl}/${id}`, body);
   }
 
-  /**
-   * Get health report history
-   */
-  getHealthReportHistory(userId: number): Observable<HealthReport[]> {
-    const params = new HttpParams().set('userId', userId.toString());
-    return this.http.get<HealthReport[]>(`${this.healthReportsUrl}/history`, { params });
+  deleteMedicationSchedule(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.medicationSchedulesUrl}/${id}`);
   }
 
-  /**
-   * Export health report
-   */
-  exportHealthReport(userId: number, period: '7d' | '30d' | '90d', format: 'pdf' | 'csv'): Observable<Blob> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('period', period)
-      .set('format', format);
+  // ==================== SMART ALERTS ====================
 
-    return this.http.get(`${this.healthReportsUrl}/export`, { params, responseType: 'blob' });
+  getAlertById(alertId: number): Observable<HealthAlert> {
+    return this.http.get<HealthAlert>(`${this.alertsUrl}/${alertId}`);
   }
 
-  // ==================== AI RECOMMENDATIONS ====================
-
-  /**
-   * Get AI recommendations for user
-   */
-  getRecommendations(userId: number): Observable<AiRecommendation[]> {
-    const params = new HttpParams().set('userId', userId.toString());
-    return this.http.get<AiRecommendation[]>(this.recommendationsUrl, { params });
+  getUserAlerts(userId: number): Observable<HealthAlert[]> {
+    return this.http.get<HealthAlert[]>(`${this.alertsUrl}/user/${userId}`);
   }
 
-  /**
-   * Get recommendations by type
-   */
-  getRecommendationsByType(
-    userId: number,
-    type: 'SLEEP' | 'STRESS' | 'ACTIVITY' | 'MOOD' | 'GENERAL'
-  ): Observable<AiRecommendation[]> {
-    const params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('type', type);
-
-    return this.http.get<AiRecommendation[]>(`${this.recommendationsUrl}/by-type`, { params });
+  getActiveAlerts(userId: number): Observable<HealthAlert[]> {
+    return this.http.get<HealthAlert[]>(`${this.alertsUrl}/user/${userId}/active`);
   }
 
-  /**
-   * Mark recommendation as completed
-   */
-  markRecommendationCompleted(recommendationId: number): Observable<void> {
-    return this.http.post<void>(`${this.recommendationsUrl}/${recommendationId}/complete`, {});
+  ignoreAlert(alertId: number): Observable<void> {
+    return this.http.post<void>(`${this.alertsUrl}/${alertId}/ignore`, {});
   }
 
-  /**
-   * Dismiss recommendation
-   */
-  dismissRecommendation(recommendationId: number): Observable<void> {
-    return this.http.post<void>(`${this.recommendationsUrl}/${recommendationId}/dismiss`, {});
+  escalateIgnoredAlerts(userId: number): Observable<void> {
+    return this.http.post<void>(`${this.alertsUrl}/escalate/${userId}`, {});
+  }
+
+  analyzeAlerts(userId: number): Observable<HealthAlert[]> {
+    return this.http.post<HealthAlert[]>(`${this.alertsUrl}/analyze/${userId}`, {});
+  }
+
+  deleteAlert(alertId: number): Observable<void> {
+    return this.http.delete<void>(`${this.alertsUrl}/${alertId}`);
+  }
+
+  // ==================== PREGNANCY TRACKING ====================
+
+  getPregnancyTracking(): Observable<PregnancyTracking[]> {
+    return this.http.get<PregnancyTracking[]>(this.pregnancyTrackingsUrl);
+  }
+
+  addPregnancyTracking(payload: Partial<PregnancyTracking>): Observable<PregnancyTracking> {
+    return this.http.post<PregnancyTracking>(this.pregnancyTrackingsUrl, payload);
+  }
+
+  deletePregnancyTracking(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.pregnancyTrackingsUrl}/${id}`);
+  }
+
+  // ==================== PREGNANCY CHECKUPS ====================
+
+  getPregnancyCheckups(): Observable<PregnancyCheckup[]> {
+    return this.http.get<PregnancyCheckup[]>(this.pregnancyCheckupsUrl);
+  }
+
+  addPregnancyCheckup(payload: Partial<PregnancyCheckup>): Observable<PregnancyCheckup> {
+    return this.http.post<PregnancyCheckup>(this.pregnancyCheckupsUrl, payload);
+  }
+
+  deletePregnancyCheckup(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.pregnancyCheckupsUrl}/${id}`);
   }
 }
